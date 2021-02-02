@@ -2,6 +2,9 @@
 Naca parametric bulb with Openscad.
 Perfect for 3d printed (lead casting) rc sailboat bulb.
 
+
+<img src="https://github.com/guillaumef/naca-parametric-bulb/blob/master/screenshots/bulb-NACA652415-beaver.png" width="300" alt="naca parametric bulb" align="center" />
+
 Manage:
 * asymetric NACA profile !
 * complex form for the third dimension.
