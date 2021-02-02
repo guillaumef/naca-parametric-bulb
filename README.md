@@ -7,7 +7,7 @@ Perfect for 3d printed (lead casting) rc sailboat bulb.
 
 
 Manage:
-* asymetric NACA profile !
+* asymmetric NACA profile !
 * complex form for the third dimension.
 * beaver tail
 
