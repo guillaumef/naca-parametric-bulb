@@ -1,7 +1,7 @@
-include <airfoil/naca66-018.scad>
-af_vec_path = airfoil_NACA66018_path ();
-af_vec_slice = airfoil_NACA66018_slice ();
-af_vec_range = airfoil_NACA66018_range ();
+include <airfoil/naca65A012.scad>
+af_vec_path = airfoil_NACA65A012_path ();
+af_vec_slice = airfoil_NACA65A012_slice ();
+af_vec_range = airfoil_NACA65A012_range ();
 
 
 $fn=100;
