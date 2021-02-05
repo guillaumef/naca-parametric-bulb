@@ -1,4 +1,16 @@
-// generated from tp66s.dat
+/* Generated from tp66s.dat
+
+Usage (copy/paste):
+
+//    TP66S
+include <airfoil/tp66s.scad>
+af_vec_path   = airfoil_TP66S_path ();
+af_vec_slice  = airfoil_TP66S_slice ();
+af_vec_range  = airfoil_TP66S_range ();
+airfoil_TP66S (); // 2d object
+
+
+*/
 function airfoil_TP66S_path () = [
      [         100 ,       0.007 ]
     ,[      99.578 ,       0.056 ]

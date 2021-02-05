@@ -1,4 +1,16 @@
-// generated from naca64A210.dat
+/* Generated from naca64A210.dat
+
+Usage (copy/paste):
+
+//    NACA64A210
+include <airfoil/naca64A210.scad>
+af_vec_path   = airfoil_NACA64A210_path ();
+af_vec_slice  = airfoil_NACA64A210_slice ();
+af_vec_range  = airfoil_NACA64A210_range ();
+airfoil_NACA64A210 (); // 2d object
+
+
+*/
 function airfoil_NACA64A210_path () = [
      [         100 , 0.0206954533722736 ]
     ,[      99.998 ,       0.021 ]

@@ -1,4 +1,16 @@
-// generated from mg05.dat
+/* Generated from mg05.dat
+
+Usage (copy/paste):
+
+//    MG05
+include <airfoil/mg05.scad>
+af_vec_path   = airfoil_MG05_path ();
+af_vec_slice  = airfoil_MG05_slice ();
+af_vec_range  = airfoil_MG05_range ();
+airfoil_MG05 (); // 2d object
+
+
+*/
 function airfoil_MG05_path () = [
      [         100 ,           0 ]
     ,[       97.02 ,    0.140283 ]

@@ -1,4 +1,16 @@
-// generated from sb96vs.dat
+/* Generated from sb96vs.dat
+
+Usage (copy/paste):
+
+//    SB96VS
+include <airfoil/sb96vs.scad>
+af_vec_path   = airfoil_SB96VS_path ();
+af_vec_slice  = airfoil_SB96VS_slice ();
+af_vec_range  = airfoil_SB96VS_range ();
+airfoil_SB96VS (); // 2d object
+
+
+*/
 function airfoil_SB96VS_path () = [
      [         100 ,      0.0196 ]
     ,[     98.2488 ,       0.333 ]

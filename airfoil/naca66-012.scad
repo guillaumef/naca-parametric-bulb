@@ -1,4 +1,16 @@
-// generated from naca66-012.dat
+/* Generated from naca66-012.dat
+
+Usage (copy/paste):
+
+//    NACA66012
+include <airfoil/naca66-012.scad>
+af_vec_path   = airfoil_NACA66012_path ();
+af_vec_slice  = airfoil_NACA66012_slice ();
+af_vec_range  = airfoil_NACA66012_range ();
+airfoil_NACA66012 (); // 2d object
+
+
+*/
 function airfoil_NACA66012_path () = [
      [         100 ,           0 ]
     ,[      98.671 , 0.0879999999999989 ]

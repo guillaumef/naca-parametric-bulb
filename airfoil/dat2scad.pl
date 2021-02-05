@@ -22,29 +22,51 @@ $name =~ s/[.].*$//g;
 # cleanup
 $name =~ s/[^a-z0-9]//gi;
 
+sub cS2D {
+  my ($pv) = @_;
+  if (index($$pv,'e')>0 || index($$pv,'E')>0) {
+    $$pv = lc($$pv);
+    $$pv = sprintf("%.10g", $$pv);
+  }
+}
+
 my @aplot = ();
 open FH, "$dat";
 # loop
+my $lowestx = 1000;
+my $lowestxpos = 0;
+my $prevxpos = -1000;
 while (<FH>) {
   chomp;
   my $l = $_;
   # LR Trim
   $l =~ s/(^\s+|\s+$)//g;
-  next unless $l;
+  if (! $l) {
+    last if ($#aplot>10);
+    next;
+  }
   # Split
-  my ($x,$y) = ($l =~ /^([0-9.-]+)\s+([0-9.-]+)$/);
+  my ($x,$y) = ($l =~ /^([0-9.Ee+-]+)\s+([0-9.Ee+-]+)$/);
   if ($x || $y) {
+    cS2D( \$x ); cS2D( \$y );
+    next if ($prevxpos == $x);
+    $prevxpos = $x;
     $x *= $scale;
     $y *= $scale;
     push(@aplot,[$x,$y]);
+    if ($x < $lowestx) { $lowestx = $x; $lowestxpos = $#aplot; }
   }
 }
 close FH;
 
 # Control
-if ($#aplot < 30) {
+if ($#aplot < 10) {
   print STDERR "Found only ".scalar(@aplot)." points\n";
 }
+# Clean
+if ($aplot[0][0] != 1.0)        { $aplot[0][0] = $scale; }
+if ($aplot[$#aplot][0] != 1.0)  { $aplot[$#aplot][0] = $scale; }
+if ($lowestx != 0.0)            { $aplot[$lowestxpos][0] = 0.0; }
 
 ## Upper/Lower parts
 #
@@ -85,10 +107,27 @@ foreach my $x (sort { $b <=> $a } keys %hallx) {
 push @aplotexpand, @aplotexpandlower;
 
 
+my $DOC = <<EOF;
+//    $name
+include <airfoil/$scad>
+af_vec_path   = airfoil_$name\_path ();
+af_vec_slice  = airfoil_$name\_slice ();
+af_vec_range  = airfoil_$name\_range ();
+airfoil_$name (); // 2d object
+EOF
+
+
+
 ## Print results
 open FH, ">$scad";
 print FH <<EOF;
-// generated from $dat
+/* Generated from $dat
+
+Usage (copy/paste):
+
+$DOC
+
+*/
 EOF
 
 ###
@@ -132,15 +171,9 @@ module airfoil_$name () {
 }
 EOF
 
-
-
 close FH;
-printf "// %20s\n", $name;
-print  "include <airfoil/$scad>\n";
-print  "af_vec_path = airfoil_$name\_path ();\n";
-print  "af_vec_slice = airfoil_$name\_slice ();\n";
-print  "af_vec_range = airfoil_$name\_range ();\n";
-print  "airfoil_$name (); /* 2d object */\n";
+
+print $DOC;
 
 1;
 __END__

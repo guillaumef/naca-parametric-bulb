@@ -1,24 +1,28 @@
-include <airfoil/naca66-012.scad>
-af_vec_path = airfoil_NACA66012_path ();
-af_vec_slice = airfoil_NACA66012_slice ();
-af_vec_range = airfoil_NACA66012_range ();
 
+include <airfoil/naca66-018.scad>
+af_vec_path   = airfoil_NACA66018_path ();
+af_vec_slice  = airfoil_NACA66018_slice ();
+af_vec_range  = airfoil_NACA66018_range ();
 
-$fn=100;
+$fn=150;
 
+AIRFOIL_SCALE_Z = 0.69;	/* thinner/thicker profile: 1 for original */
 PROC = 3;		/* 1=show2dprofile, 2=showsection, 3=bulb */
-ZOBJ = 1;		/* 1=circle, 2=ellipse, 3=roundsquare, 4=trapeze */
-BULB_SCALE = 2;		/* Final bulb scale - to reach weight */
+CUT = 1;		/* For PROC==3, cut the part in two pieces at the highest point
+			   1=head, 2=tail, 3=longitudinal_cut_right, 4=longitudinal_cut_left */ 
+ZOBJ = 3;		/* 1=circle, 2=ellipse, 3=flatten-ellipse, 3=roundsquare, 4=trapeze */
+BULB_SCALE = 2.5;	/* Final bulb scale - to reach weight - 2.5 => 250mm */
 
-BEAVER_TAIL_ANGLE = 0;	/* Beaver tail? : 0 = no beaver tail.
+BEAVER_TAIL_ANGLE = 1.2;/* Beaver tail? : 0 = no beaver tail.
 			   WARNING: CPU intensive for final rendering
 			   >0 = rotation angle - final deviation = 2*BEAVER_TAIL_ANGLE
-			   <=1 is enough
+			   <=2 is enough
 			 */
-BEAVER_TAIL_START = 70; /* Beaver tail deviation starting at this percentage of the bulb */
+BEAVER_TAIL_START = 65; /* Beaver tail deviation starting at this percentage of the bulb */
 
 module show2dprofile() {
-	translate([ - af_vec_range[0], 0, 0 ])
+	scale([1,AIRFOIL_SCALE_Z,1])
+		translate([ - af_vec_range[0], 0, 0 ])
 		polygon(points=af_vec_path);
 }
 /* Defines the z axis object / polygon - need a linear extrude one with minimum height */
@@ -31,6 +35,14 @@ module section_ellipse() {
 	translate([0,5,0]) rotate([0,90,]) linear_extrude(0.0001)
 		scale([1.5,1,1])
 		circle(r=5);
+}
+module section_fellipse() {
+	translate([0,5,0]) rotate([0,90,])
+		linear_extrude(0.0001)
+		hull() {
+			translate([2.0,0,0]) circle(r=5);
+			translate([-2.0,0,0]) circle(r=5);
+		}
 }
 module section_roundsquare() {
 	translate([0,0,5]) rotate([0,90,])
@@ -56,8 +68,9 @@ module section_trapeze() {
 module section() {
 	if (ZOBJ == 1) { section_circle(); }
 	if (ZOBJ == 2) { section_ellipse(); }
-	if (ZOBJ == 3) { section_roundsquare(); }
-	if (ZOBJ == 4) { section_trapeze(); }
+	if (ZOBJ == 3) { section_fellipse(); }
+	if (ZOBJ == 4) { section_roundsquare(); }
+	if (ZOBJ == 5) { section_trapeze(); }
 }
 
 module showsection() {
@@ -66,8 +79,8 @@ module showsection() {
 }
 
 module slice(xyy) {
-	coef = ((xyy[1] - xyy[2]) / 10);
-	translate([ xyy[0], xyy[2], 0])
+	coef = ((xyy[1] - xyy[2]) / 10) * AIRFOIL_SCALE_Z;
+	translate([ xyy[0], xyy[2] * AIRFOIL_SCALE_Z, 0])
 		scale([1, coef, coef]) section();
 }
 
@@ -111,6 +124,11 @@ module bulb() {
 	}
 }
 
+module bulbscaled() {
+	rotate([90,0,90])
+		scale([BULB_SCALE,BULB_SCALE,BULB_SCALE])
+		bulb();
+}
 
 
 if (PROC == 1) {
@@ -120,9 +138,44 @@ else if (PROC == 2) {
 	showsection();
 }
 else {
-	rotate([90,0,90])
-	scale([BULB_SCALE,BULB_SCALE,BULB_SCALE]) {
-		bulb();
+	if (CUT == 1) {
+		difference() {
+			bulbscaled();
+			for (xyy = af_vec_slice) {
+				if (xyy[1] == af_vec_range[3]) {
+					translate([0,(50+xyy[0]) * BULB_SCALE,0])
+						cube([100*BULB_SCALE,100*BULB_SCALE,100*BULB_SCALE],
+								center=true);
+				}
+			}
+		}
+	}
+	else if (CUT == 2) {
+		difference() {
+			bulbscaled();
+			for (xyy = af_vec_slice) {
+				if (xyy[1] == af_vec_range[3]) {
+					translate([0,(-50+xyy[0]) * BULB_SCALE,0])
+						cube([100*BULB_SCALE,100*BULB_SCALE,100*BULB_SCALE],
+								center=true);
+				}
+			}
+		}
+	}
+	else if (CUT == 3) {
+		difference() {
+			bulbscaled();
+			translate([50*BULB_SCALE,50*BULB_SCALE,0]) cube([100*BULB_SCALE,100*BULB_SCALE,100*BULB_SCALE],center=true);
+		}
+	}
+	else if (CUT == 4) {
+		difference() {
+			bulbscaled();
+			translate([-50*BULB_SCALE,50*BULB_SCALE,0]) cube([100*BULB_SCALE,100*BULB_SCALE,100*BULB_SCALE],center=true);
+		}
+	}
+	else {
+		bulbscaled();
 	}
 }
 
